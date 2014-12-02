@@ -27,16 +27,14 @@ public class CommandLogonApplication extends HystrixCommand<String> {
     private static final Logger logger = LoggerFactory.getLogger(CommandLogonApplication.class);
 
     private URI tokenServiceUri ;
-    private String applicationid ;
-    private String applicationsecret;
+    private ApplicationCredential appCredential ;
 
 
 
-    public CommandLogonApplication(URI tokenServiceUri,String applicationid,String applicationsecret) {
+    public CommandLogonApplication(URI tokenServiceUri,ApplicationCredential appCredential) {
         super(HystrixCommandGroupKey.Factory.asKey("SSOApplicationAuthGroup"));
         this.tokenServiceUri = tokenServiceUri;
-        this.applicationid=applicationid;
-        this.applicationsecret=applicationsecret;
+        this.appCredential=appCredential;
     }
 
     @Override
@@ -45,9 +43,6 @@ public class CommandLogonApplication extends HystrixCommand<String> {
         Client tokenServiceClient = Client.create();
         WebResource logonResource = tokenServiceClient.resource(tokenServiceUri).path("logon");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        ApplicationCredential appCredential = new ApplicationCredential();
-        appCredential.setApplicationID(applicationid);
-        appCredential.setApplicationSecret(applicationsecret);
 
 
         formData.add("applicationcredential", appCredential.toXML());

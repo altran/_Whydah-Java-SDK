@@ -1,5 +1,6 @@
 package net.whydah.sso.commands;
 
+import net.whydah.sso.application.ApplicationCredential;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import rx.Observable;
@@ -18,13 +19,15 @@ import static org.junit.Assert.assertTrue;
 public class TestCommandLogonApplication {
 
     private static URI tokenServiceUri;
-    private static String applicationid;
+    private static ApplicationCredential appCredential;
 
 
     @BeforeClass
     public static void setup() throws Exception {
         tokenServiceUri = UriBuilder.fromUri("https://whydahdev.altrancloud.com/tokenservice/").build();
-        applicationid = "15";
+        appCredential = new ApplicationCredential();
+        appCredential.setApplicationID("15");
+
 
     }
 
@@ -33,16 +36,17 @@ public class TestCommandLogonApplication {
     public void testApplicationLoginCommandFallback() throws Exception {
 
         String applicationsecret = "false secret";
+        appCredential.setApplicationSecret(applicationsecret);
 
-        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, applicationid, applicationsecret).execute();
+        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
         assertEquals("FallbackApplicationTokenID", myApplicationTokenID);
 
-        Future<String> fAppTokenID = new CommandLogonApplication(tokenServiceUri, applicationid, applicationsecret).queue();
+        Future<String> fAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).queue();
         assertEquals("FallbackApplicationTokenID", fAppTokenID.get());
 
 
-        Observable<String> oAppTokenID = new CommandLogonApplication(tokenServiceUri, applicationid, applicationsecret).observe();
+        Observable<String> oAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).observe();
         // blocking
         assertEquals("FallbackApplicationTokenID", oAppTokenID.toBlocking().single());
     }
@@ -51,14 +55,15 @@ public class TestCommandLogonApplication {
     public void testApplicationLoginCommand() throws Exception {
 
         String applicationsecret = "33779936R6Jr47D4Hj5R6p9qT";
-        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, applicationid, applicationsecret).execute();
+        appCredential.setApplicationSecret(applicationsecret);
+        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
         assertTrue(myApplicationTokenID.length() > 6);
 
-        Future<String> fAppTokenID = new CommandLogonApplication(tokenServiceUri, applicationid, applicationsecret).queue();
+        Future<String> fAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).queue();
         assertTrue(fAppTokenID.get().length() > 6);
 
-        Observable<String> oAppTokenID = new CommandLogonApplication(tokenServiceUri, applicationid, applicationsecret).observe();
+        Observable<String> oAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).observe();
         // blocking
         assertTrue(oAppTokenID.toBlocking().single().length() > 6);
     }
