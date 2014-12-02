@@ -26,16 +26,19 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
     private static final Logger logger = LoggerFactory.getLogger(CommandLogonUserByUserCredential.class);
 
     private URI tokenServiceUri;
-    private ApplicationCredential appCredential ;
+    private String myAppTokenId;
+    private ApplicationCredential appCredential;
     private UserCredential userCredential;
     private String userticket;
 
 
 
-    public CommandLogonUserByUserCredential(URI tokenServiceUri,ApplicationCredential appCredential ,UserCredential userCredential,String userticket) {
+    public CommandLogonUserByUserCredential(URI tokenServiceUri,String myAppTokenId,ApplicationCredential appCredential ,UserCredential userCredential,String userticket) {
         super(HystrixCommandGroupKey.Factory.asKey("SSOAUserAuthGroup"));
         this.tokenServiceUri = tokenServiceUri;
+        this.myAppTokenId=myAppTokenId;
         this.appCredential=appCredential;
+        this.userCredential=userCredential;
         this.userticket=userticket;
     }
 
@@ -47,7 +50,7 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
         //logonApplication();
         logger.debug("getUserToken - Application logon OK. applicationTokenId={}. Log on with user credentials {}.", appCredential.getApplicationID(), userCredential.toString());
 
-        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + appCredential.getApplicationID() + "/" + userticket + "/usertoken");
+        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/" + userticket + "/usertoken");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("apptoken", appCredential.toXML());
         formData.add("usercredential", userCredential.toXML());
