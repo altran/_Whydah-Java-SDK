@@ -41,6 +41,9 @@ public class CommandLogonApplication extends HystrixCommand<String> {
     @Override
     protected String run() {
 
+        logger.trace("CommandLogonApplication - appCredential={}",appCredential.toXML());
+
+
         Client tokenServiceClient = Client.create();
         WebResource logonResource = tokenServiceClient.resource(tokenServiceUri).path("logon");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
