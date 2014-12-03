@@ -44,7 +44,7 @@ public class CommandGetUsertokenByUserticket extends HystrixCommand<String> {
     @Override
     protected String run() {
 
-        // logonApplication();
+        logger.trace("CommandValidateUsertokenId - myAppTokenId={}",myAppTokenId);
 
         Client tokenServiceClient = Client.create();
 

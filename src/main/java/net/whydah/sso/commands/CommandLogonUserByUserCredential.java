@@ -46,6 +46,7 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
     @Override
     protected String run() {
 
+        logger.trace("CommandValidateUsertokenId - myAppTokenId={}",myAppTokenId);
 
         Client tokenServiceClient = Client.create();
         //logonApplication();

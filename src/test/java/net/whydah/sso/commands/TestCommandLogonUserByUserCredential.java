@@ -45,6 +45,7 @@ public class TestCommandLogonUserByUserCredential {
             String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
             System.out.println(myAppTokenXml);
             String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
+            System.out.println(myApplicationTokenID);
 
             assertTrue(myApplicationTokenID.length() > 6);
 

@@ -36,7 +36,7 @@ public class CommandValidateUsertokenId extends HystrixCommand<Boolean> {
     @Override
     protected Boolean run() {
 
-        // logonApplication();
+        logger.trace("CommandValidateUsertokenId - myAppTokenId={}",myAppTokenId);
 
         Client tokenServiceClient = Client.create();
 
