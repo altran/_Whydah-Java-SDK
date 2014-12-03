@@ -55,8 +55,8 @@ public class CommandGetUsertokenByUserticket extends HystrixCommand<String> {
         formData.add("userticket", userticket);
         ClientResponse response = userTokenResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
-            logger.warn("getUserTokenByUserTicket failed");
-            throw new IllegalArgumentException("getUserTokenByUserTicket failed.");
+            logger.warn("CommandGetUsertokenByUserticket - getUserTokenByUserTicket failed");
+            throw new IllegalArgumentException("CommandGetUsertokenByUserticket - getUserTokenByUserTicket failed.");
         }
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);

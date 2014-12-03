@@ -28,17 +28,17 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
 
     private URI tokenServiceUri;
     private String myAppTokenId;
-    private ApplicationCredential appCredential;
+    private String myAppTokenXml;
     private UserCredential userCredential;
     private String userticket;
 
 
 
-    public CommandLogonUserByUserCredential(URI tokenServiceUri,String myAppTokenId,ApplicationCredential appCredential ,UserCredential userCredential,String userticket) {
+    public CommandLogonUserByUserCredential(URI tokenServiceUri,String myAppTokenId,String myAppTokenXml ,UserCredential userCredential,String userticket) {
         super(HystrixCommandGroupKey.Factory.asKey("SSOAUserAuthGroup"));
         this.tokenServiceUri = tokenServiceUri;
         this.myAppTokenId=myAppTokenId;
-        this.appCredential=appCredential;
+        this.myAppTokenXml=myAppTokenXml;
         this.userCredential=userCredential;
         this.userticket=userticket;
     }
@@ -49,22 +49,20 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
         logger.trace("CommandValidateUsertokenId - myAppTokenId={}",myAppTokenId);
 
         Client tokenServiceClient = Client.create();
-        //logonApplication();
-        logger.debug("getUserToken - Application logon OK. applicationTokenId={}. Log on with user credentials {}.", appCredential.getApplicationID(), userCredential.toString());
 
         WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/" + userticket + "/usertoken");
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", appCredential.toXML());
+        formData.add("apptoken", myAppTokenXml);
         formData.add("usercredential", userCredential.toXML());
         ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
-            logger.info("getUserToken - User authentication failed with status code " + response.getStatus());
+            logger.info("CommandValidateUsertokenId - getUserToken - User authentication failed with status code " + response.getStatus());
             return null;
             //throw new IllegalArgumentException("Log on failed. " + ClientResponse.Status.FORBIDDEN);
         }
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
-            logger.debug("getUserToken - Log on OK with response {}", responseXML);
+            logger.debug("CommandValidateUsertokenId - getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         }
 
@@ -72,12 +70,12 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
         response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
-            logger.debug("getUserToken - Log on OK with response {}", responseXML);
+            logger.debug("CommandValidateUsertokenId - getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         } else if (response.getStatus() == NOT_FOUND.getStatusCode()) {
-            logger.error(ExceptionUtil.printableUrlErrorMessage("getUserToken - Auth failed - Problems connecting with TokenService", getUserToken, response));
+            logger.error(ExceptionUtil.printableUrlErrorMessage("CommandValidateUsertokenId - getUserToken - Auth failed - Problems connecting with TokenService", getUserToken, response));
         } else {
-            logger.info(ExceptionUtil.printableUrlErrorMessage("getUserToken - User authentication failed", getUserToken, response));
+            logger.info(ExceptionUtil.printableUrlErrorMessage("CommandValidateUsertokenId - getUserToken - User authentication failed", getUserToken, response));
         }
         return null;
         //throw new RuntimeException("User authentication failed with status code " + response.getStatus());

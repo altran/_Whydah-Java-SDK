@@ -31,6 +31,7 @@ public class TestCommandLogonUserByUserCredential {
             appCredential = new ApplicationCredential();
             appCredential.setApplicationID("15");
             String applicationsecret = "33779936R6Jr47D4Hj5R6p9qT";
+
             appCredential.setApplicationSecret(applicationsecret);
             userCredential = new UserCredential("useradmin","useradmin42");
 
@@ -50,7 +51,7 @@ public class TestCommandLogonUserByUserCredential {
             assertTrue(myApplicationTokenID.length() > 6);
 
             String userticket = UUID.randomUUID().toString();
-            String userToken = new CommandLogonUserByUserCredential(tokenServiceUri,myApplicationTokenID,  appCredential, userCredential,userticket ).execute();
+            String userToken = new CommandLogonUserByUserCredential(tokenServiceUri,myApplicationTokenID,  myAppTokenXml, userCredential,userticket ).execute();
 
             String userTokenId = UserXpathHelper.getUserTokenId(userToken);
             assertTrue(new CommandValidateUsertokenId(tokenServiceUri,myApplicationTokenID,userTokenId).execute());
