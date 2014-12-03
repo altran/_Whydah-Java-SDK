@@ -1,6 +1,7 @@
 package net.whydah.sso.commands;
 
 import net.whydah.sso.application.ApplicationCredential;
+import net.whydah.sso.application.ApplicationHelper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import rx.Observable;
@@ -42,15 +43,15 @@ public class TestCommandLogonApplication {
 
         String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
-        assertEquals("FallbackApplicationTokenID", myApplicationTokenID);
+        assertEquals(ApplicationHelper.getDummyApplicationToken(), myApplicationTokenID);
 
         Future<String> fAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).queue();
-        assertEquals("FallbackApplicationTokenID", fAppTokenID.get());
+        assertEquals(ApplicationHelper.getDummyApplicationToken(), fAppTokenID.get());
 
 
         Observable<String> oAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).observe();
         // blocking
-        assertEquals("FallbackApplicationTokenID", oAppTokenID.toBlocking().single());
+        assertEquals(ApplicationHelper.getDummyApplicationToken(), oAppTokenID.toBlocking().single());
     }
 
     @Test
