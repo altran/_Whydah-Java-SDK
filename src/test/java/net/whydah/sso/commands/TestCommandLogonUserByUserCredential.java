@@ -71,4 +71,21 @@ public class TestCommandLogonUserByUserCredential {
 
     }
 
+    @Test
+    public void testFullCircleWithContext() {
+        HystrixRequestContext context = HystrixRequestContext.initializeContext();
+        try {
+            String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+            String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
+            String userticket = UUID.randomUUID().toString();
+            String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, userticket).execute();
+            String userTokenId = UserXpathHelper.getUserTokenId(userToken);
+            assertTrue(new CommandValidateUsertokenId(tokenServiceUri, myApplicationTokenID, userTokenId).execute());
+        } finally {
+            context.shutdown();
+        }
+
+    }
+
+
 }
