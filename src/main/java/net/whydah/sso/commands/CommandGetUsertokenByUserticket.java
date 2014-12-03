@@ -22,7 +22,7 @@ import static com.sun.jersey.api.client.ClientResponse.Status.OK;
  */
 public class CommandGetUsertokenByUserticket extends HystrixCommand<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommandLogonApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommandGetUsertokenByUserticket.class);
 
     private URI tokenServiceUri ;
     private String myAppTokenId ;
@@ -31,7 +31,7 @@ public class CommandGetUsertokenByUserticket extends HystrixCommand<String> {
 
 
 
-    public CommandGetUsertokenByUserticket(URI tokenServiceUri,String myAppTokenId,String userticket,String myAppTokenXml) {
+    public CommandGetUsertokenByUserticket(URI tokenServiceUri,String myAppTokenId,String myAppTokenXml,String userticket) {
         super(HystrixCommandGroupKey.Factory.asKey("SSOAUserAuthGroup"));
         this.tokenServiceUri = tokenServiceUri;
         this.myAppTokenId=myAppTokenId;

@@ -18,8 +18,8 @@ import java.io.StringReader;
 
 
 
-public class UserTokenXpathHelper {
-    private static final Logger logger = LoggerFactory.getLogger(UserTokenXpathHelper.class);
+public class UserXpathHelper {
+    private static final Logger logger = LoggerFactory.getLogger(UserXpathHelper.class);
 
     public static String getUserTokenId(String userTokenXml) {
         if (userTokenXml == null) {
@@ -43,24 +43,6 @@ public class UserTokenXpathHelper {
     }
 
 
-    public static  String getAppTokenIdFromAppToken(String appTokenXML) {
-        //logger.trace("appTokenXML: {}", appTokenXML);
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new InputSource(new StringReader(appTokenXML)));
-            XPath xPath = XPathFactory.newInstance().newXPath();
-
-            String expression = "/applicationtoken/params/applicationtokenID[1]";
-            XPathExpression xPathExpression = xPath.compile(expression);
-            String appId = xPathExpression.evaluate(doc);
-            logger.debug("getAppTokenIdFromAppToken: applicationTokenId={}, appTokenXML={}", appId, appTokenXML);
-            return appId;
-        } catch (Exception e) {
-            logger.error("getAppTokenIdFromAppToken - appTokenXML - Could not get applicationID from XML: " + appTokenXML, e);
-        }
-        return "";
-    }
 
     public static String getRealName(String userTokenXml){
         if (userTokenXml==null){

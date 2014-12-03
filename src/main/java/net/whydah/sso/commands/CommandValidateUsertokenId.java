@@ -5,25 +5,20 @@ import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import net.whydah.sso.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import java.net.URI;
 
 import static com.sun.jersey.api.client.ClientResponse.Status.CONFLICT;
-import static com.sun.jersey.api.client.ClientResponse.Status.FORBIDDEN;
 import static com.sun.jersey.api.client.ClientResponse.Status.OK;
 
 /**
  * Created by totto on 12/2/14.
  */
-public class CommandValidateUsertokenid extends HystrixCommand<Boolean> {
+public class CommandValidateUsertokenId extends HystrixCommand<Boolean> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommandLogonApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommandValidateUsertokenId.class);
 
     private URI tokenServiceUri ;
     private String myAppTokenId ;
@@ -31,7 +26,7 @@ public class CommandValidateUsertokenid extends HystrixCommand<Boolean> {
 
 
 
-    public CommandValidateUsertokenid(URI tokenServiceUri,String myAppTokenId,String usertokenid) {
+    public CommandValidateUsertokenId(URI tokenServiceUri, String myAppTokenId, String usertokenid) {
         super(HystrixCommandGroupKey.Factory.asKey("SSOAUserAuthGroup"));
         this.tokenServiceUri = tokenServiceUri;
         this.myAppTokenId=myAppTokenId;
@@ -72,7 +67,7 @@ public class CommandValidateUsertokenid extends HystrixCommand<Boolean> {
 
     @Override
     protected Boolean getFallback() {
-        return false;
+        return true;
     }
 
 

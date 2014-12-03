@@ -7,7 +7,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.whydah.sso.application.ApplicationCredential;
-import net.whydah.sso.user.UserTokenXpathHelper;
+import net.whydah.sso.application.ApplicationXpathHelper;
+import net.whydah.sso.user.UserXpathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,10 +60,11 @@ public class CommandLogonApplication extends HystrixCommand<String> {
             throw new RuntimeException("CommandLogonApplication - Application authentication failed");
         }
         String myAppTokenXml = response.getEntity(String.class);
-        String myAppTokenId = UserTokenXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
+        String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
+
         logger.debug("CommandLogonApplication - Applogon ok: apptokenxml: {}", myAppTokenXml);
-        logger.debug("CommandLogonApplication - myAppTokenId: {}", myAppTokenId);
-        return myAppTokenId;
+        logger.debug("CommandLogonApplication - myAppTokenId: {}", myApplicationTokenID);
+        return myAppTokenXml;
     }
 
     @Override
