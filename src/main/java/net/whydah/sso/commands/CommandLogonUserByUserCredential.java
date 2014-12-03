@@ -46,7 +46,7 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
     @Override
     protected String run() {
 
-        logger.trace("CommandValidateUsertokenId - myAppTokenId={}",myAppTokenId);
+        logger.trace("CommandLogonUserByUserCredential - myAppTokenId={}",myAppTokenId);
 
         Client tokenServiceClient = Client.create();
 
@@ -56,13 +56,13 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
         formData.add("usercredential", userCredential.toXML());
         ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
-            logger.info("CommandValidateUsertokenId - getUserToken - User authentication failed with status code " + response.getStatus());
+            logger.info("CommandLogonUserByUserCredential - getUserToken - User authentication failed with status code " + response.getStatus());
             return null;
             //throw new IllegalArgumentException("Log on failed. " + ClientResponse.Status.FORBIDDEN);
         }
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
-            logger.debug("CommandValidateUsertokenId - getUserToken - Log on OK with response {}", responseXML);
+            logger.debug("CommandLogonUserByUserCredential - getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         }
 
@@ -70,12 +70,12 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
         response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
-            logger.debug("CommandValidateUsertokenId - getUserToken - Log on OK with response {}", responseXML);
+            logger.debug("CommandLogonUserByUserCredential - getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         } else if (response.getStatus() == NOT_FOUND.getStatusCode()) {
-            logger.error(ExceptionUtil.printableUrlErrorMessage("CommandValidateUsertokenId - getUserToken - Auth failed - Problems connecting with TokenService", getUserToken, response));
+            logger.error(ExceptionUtil.printableUrlErrorMessage("CommandLogonUserByUserCredential - getUserToken - Auth failed - Problems connecting with TokenService", getUserToken, response));
         } else {
-            logger.info(ExceptionUtil.printableUrlErrorMessage("CommandValidateUsertokenId - getUserToken - User authentication failed", getUserToken, response));
+            logger.info(ExceptionUtil.printableUrlErrorMessage("CommandLogonUserByUserCredential - getUserToken - User authentication failed", getUserToken, response));
         }
         return null;
         //throw new RuntimeException("User authentication failed with status code " + response.getStatus());
