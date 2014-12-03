@@ -27,7 +27,7 @@ public class CommandValidateUsertokenId extends HystrixCommand<Boolean> {
 
 
     public CommandValidateUsertokenId(URI tokenServiceUri, String myAppTokenId, String usertokenid) {
-        super(HystrixCommandGroupKey.Factory.asKey("SSOAUserAuthGroup"));
+        super(HystrixCommandGroupKey.Factory.asKey("SSOUserAuthGroup"));
         this.tokenServiceUri = tokenServiceUri;
         this.myAppTokenId=myAppTokenId;
         this.usertokenid=usertokenid;
@@ -36,7 +36,7 @@ public class CommandValidateUsertokenId extends HystrixCommand<Boolean> {
     @Override
     protected Boolean run() {
 
-        logger.trace("CommandValidateUsertokenId - myAppTokenId={}",myAppTokenId);
+        logger.trace("CommandValidateUsertokenId - myAppTokenId={}, userTokenID{}",myAppTokenId,usertokenid);
 
         Client tokenServiceClient = Client.create();
 

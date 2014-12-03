@@ -1,5 +1,7 @@
 package net.whydah.sso.commands;
 
+import com.netflix.hystrix.HystrixCommandProperties;
+import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext;
 import net.whydah.sso.application.ApplicationCredential;
 import net.whydah.sso.application.ApplicationXpathHelper;
 import net.whydah.sso.user.UserCredential;
@@ -22,6 +24,7 @@ public class TestCommandLogonUserByUserCredential {
     private static URI tokenServiceUri;
     private static ApplicationCredential appCredential;
     private static UserCredential userCredential;
+    private static boolean integrationMode=true;
 
 
     @BeforeClass
@@ -34,11 +37,13 @@ public class TestCommandLogonUserByUserCredential {
         appCredential.setApplicationSecret(applicationsecret);
         userCredential = new UserCredential("useradmin", "useradmin42");
 
+        HystrixCommandProperties.Setter().withFallbackEnabled(!integrationMode);
+        HystrixRequestContext context = HystrixRequestContext.initializeContext();
 
     }
 
 
-    @Ignore
+
     @Test
     public void testApplicationLoginCommand() throws Exception {
 
@@ -52,9 +57,13 @@ public class TestCommandLogonUserByUserCredential {
         String userticket = UUID.randomUUID().toString();
         String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, userticket).execute();
 
+        myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+        System.out.println(myAppTokenXml);
+        myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
         String userTokenId = UserXpathHelper.getUserTokenId(userToken);
-        Boolean res = new CommandValidateUsertokenId(tokenServiceUri, myApplicationTokenID, userTokenId).execute();
-        assertTrue(res);
+        if (integrationMode) {
+            assertTrue(new CommandValidateUsertokenId(tokenServiceUri, myApplicationTokenID, userTokenId).execute());
+        }
 
         String userToken2 = new CommandGetUsertokenByUserticket(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userticket).execute();
 
