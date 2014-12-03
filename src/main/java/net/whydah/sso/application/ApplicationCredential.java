@@ -5,8 +5,8 @@ package net.whydah.sso.application;
  */
 
 public class ApplicationCredential {
-    private String applicationID="apphkjhkjhkjh";
-    private String applicationSecret ="nmnmnm,n,";
+    private String applicationID = "apphkjhkjhkjh";
+    private String applicationSecret = "nmnmnm,n,";
 
     private final String templateToken = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n " +
             "<template>\n" +
@@ -19,9 +19,8 @@ public class ApplicationCredential {
             "</template>";
 
 
-
-    public String toXML(){
-        if (applicationID == null){
+    public String toXML() {
+        if (applicationID == null) {
             return templateToken;
         } else {
             return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> \n " +
@@ -30,7 +29,7 @@ public class ApplicationCredential {
                     "        <applicationID>" + getApplicationID() + "</applicationID>\n" +
                     "        <applicationSecret>" + getApplicationSecret() + "</applicationSecret>\n" +
                     "    </params> \n" +
-                    "</applicationcredential>\n" ;
+                    "</applicationcredential>\n";
         }
     }
 
@@ -38,6 +37,7 @@ public class ApplicationCredential {
     public void setApplicationID(String applicationID) {
         this.applicationID = applicationID;
     }
+
     public void setApplicationSecret(String applicationSecret) {
         this.applicationSecret = applicationSecret;
     }
@@ -45,10 +45,9 @@ public class ApplicationCredential {
     public String getApplicationID() {
         return applicationID;
     }
+
     public String getApplicationSecret() {
         return applicationSecret;
     }
-
-
 
 }

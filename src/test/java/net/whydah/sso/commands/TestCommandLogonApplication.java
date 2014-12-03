@@ -27,6 +27,8 @@ public class TestCommandLogonApplication {
         tokenServiceUri = UriBuilder.fromUri("https://whydahdev.altrancloud.com/tokenservice/").build();
         appCredential = new ApplicationCredential();
         appCredential.setApplicationID("15");
+        String applicationsecret = "33779936R6Jr47D4Hj5R6p9qT";
+        appCredential.setApplicationSecret(applicationsecret);
 
 
     }
@@ -54,8 +56,6 @@ public class TestCommandLogonApplication {
     @Test
     public void testApplicationLoginCommand() throws Exception {
 
-        String applicationsecret = "33779936R6Jr47D4Hj5R6p9qT";
-        appCredential.setApplicationSecret(applicationsecret);
         String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
         assertTrue(myApplicationTokenID.length() > 6);

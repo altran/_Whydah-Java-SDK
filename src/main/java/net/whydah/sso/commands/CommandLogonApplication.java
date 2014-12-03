@@ -7,8 +7,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.whydah.sso.application.ApplicationCredential;
+import net.whydah.sso.application.ApplicationHelper;
 import net.whydah.sso.application.ApplicationXpathHelper;
-import net.whydah.sso.user.UserXpathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +69,6 @@ public class CommandLogonApplication extends HystrixCommand<String> {
 
     @Override
     protected String getFallback() {
-        return "FallbackApplicationTokenID";
+        return  ApplicationHelper.getDummyApplicationToken();
     }
 }
