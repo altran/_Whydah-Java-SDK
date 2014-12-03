@@ -39,7 +39,6 @@ public class TestCommandLogonUserByUserCredential {
 
 
 
-        @Ignore
         @Test
         public void testApplicationLoginCommand() throws Exception {
 
