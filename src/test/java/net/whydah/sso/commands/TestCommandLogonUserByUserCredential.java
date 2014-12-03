@@ -58,13 +58,14 @@ public class TestCommandLogonUserByUserCredential {
         String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, userticket).execute();
 
         myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
-        System.out.println(myAppTokenXml);
         myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
         String userTokenId = UserXpathHelper.getUserTokenId(userToken);
         if (integrationMode) {
             assertTrue(new CommandValidateUsertokenId(tokenServiceUri, myApplicationTokenID, userTokenId).execute());
         }
 
+        myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+        myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
         String userToken2 = new CommandGetUsertokenByUserticket(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userticket).execute();
 
 
