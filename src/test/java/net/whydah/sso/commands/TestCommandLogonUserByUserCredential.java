@@ -12,7 +12,6 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -25,41 +24,41 @@ public class TestCommandLogonUserByUserCredential {
     private static UserCredential userCredential;
 
 
-        @BeforeClass
-        public static void setup() throws Exception {
-            tokenServiceUri = UriBuilder.fromUri("https://whydahdev.altrancloud.com/tokenservice/").build();
-            appCredential = new ApplicationCredential();
-            appCredential.setApplicationID("15");
-            String applicationsecret = "33779936R6Jr47D4Hj5R6p9qT";
+    @BeforeClass
+    public static void setup() throws Exception {
+        tokenServiceUri = UriBuilder.fromUri("https://whydahdev.altrancloud.com/tokenservice/").build();
+        appCredential = new ApplicationCredential();
+        appCredential.setApplicationID("15");
+        String applicationsecret = "33779936R6Jr47D4Hj5R6p9qT";
 
-            appCredential.setApplicationSecret(applicationsecret);
-            userCredential = new UserCredential("useradmin","useradmin42");
-
-
-        }
+        appCredential.setApplicationSecret(applicationsecret);
+        userCredential = new UserCredential("useradmin", "useradmin42");
 
 
-
-        @Test
-        public void testApplicationLoginCommand() throws Exception {
-
-            String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
-            System.out.println(myAppTokenXml);
-            String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
-            System.out.println(myApplicationTokenID);
-
-            assertTrue(myApplicationTokenID.length() > 6);
-
-            String userticket = UUID.randomUUID().toString();
-            String userToken = new CommandLogonUserByUserCredential(tokenServiceUri,myApplicationTokenID,  myAppTokenXml, userCredential,userticket ).execute();
-
-            String userTokenId = UserXpathHelper.getUserTokenId(userToken);
-            Boolean res = new CommandValidateUsertokenId(tokenServiceUri,myApplicationTokenID,userTokenId).execute();
-            assertTrue(res);
-
-            String userToken2 = new CommandGetUsertokenByUserticket(tokenServiceUri,myApplicationTokenID,myAppTokenXml,userticket).execute();
+    }
 
 
-        }
+    @Ignore
+    @Test
+    public void testApplicationLoginCommand() throws Exception {
+
+        String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+        System.out.println(myAppTokenXml);
+        String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
+        System.out.println(myApplicationTokenID);
+
+        assertTrue(myApplicationTokenID.length() > 6);
+
+        String userticket = UUID.randomUUID().toString();
+        String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, userticket).execute();
+
+        String userTokenId = UserXpathHelper.getUserTokenId(userToken);
+        Boolean res = new CommandValidateUsertokenId(tokenServiceUri, myApplicationTokenID, userTokenId).execute();
+        assertTrue(res);
+
+        String userToken2 = new CommandGetUsertokenByUserticket(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userticket).execute();
+
+
+    }
 
 }
