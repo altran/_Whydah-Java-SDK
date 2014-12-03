@@ -37,7 +37,7 @@ public class TestCommandLogonUserByUserCredential {
         appCredential.setApplicationSecret(applicationsecret);
         userCredential = new UserCredential("useradmin", "useradmin42");
 
-        HystrixCommandProperties.Setter().withFallbackEnabled(!integrationMode);
+        // HystrixCommandProperties.Setter().withFallbackEnabled(!integrationMode);
         HystrixRequestContext context = HystrixRequestContext.initializeContext();
 
     }
