@@ -4,6 +4,18 @@ Whydah-Java-SDK
 A client library which might make Whydah integration more easy and more resilient
 
 
+## Binaries
+
+Binaries and dependency information for Maven, Ivy, Gradle and others can be found at [http://mvnrepo.cantara.no](http://mvnrepo.cantara.no/index.html#nexus-search;classname~Whydah).
+
+Example for Maven:
+
+```xml
+        <dependency>
+            <groupId>net.whydah.sso</groupId>
+            <artifactId>Whydah-Java-SDK</artifactId>
+            <version>x.y.z</version>
+        </dependency>
 
 
 
