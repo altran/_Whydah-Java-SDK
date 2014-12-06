@@ -14,6 +14,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -81,6 +82,8 @@ public class TestCommandLogonUserByUserCredential {
             String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, userticket).execute();
             String userTokenId = UserXpathHelper.getUserTokenId(userToken);
             assertTrue(new CommandValidateUsertokenId(tokenServiceUri, myApplicationTokenID, userTokenId).execute());
+            String userToken2 = new CommandGetUsertokenByUserticket(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userticket).execute();
+            assertEquals(userToken,userToken2);
         } finally {
             context.shutdown();
         }
