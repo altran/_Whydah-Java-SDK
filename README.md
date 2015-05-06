@@ -4,6 +4,14 @@ Whydah-Java-SDK
 A client library which aimed to make Whydah integration more easy and more resilient
 
 
+* XML and JSON parsing of Whydah datastructures sent over the wire.
+* Client logic for using Whydah Web SSO - SSOLoginWebapp (SSOLWA).
+* Client logic for using and controlling Whydah sessions - SecurityTokenService (STS).
+**	The Java SDK is in a really early stage, and is currently used to experiment with a new remoting approach to increase system resilliance
+
+For code and examples for other languages, see <https://github.com/cantara/Whydah-TestWebApp>
+
+
 ## Binaries
 
 Binaries and dependency information for Maven, Ivy, Gradle and others can be found at [http://mvnrepo.cantara.no](http://mvnrepo.cantara.no/index.html#nexus-search;classname~Whydah).
@@ -16,7 +24,7 @@ Example for Maven:
             <artifactId>Whydah-Java-SDK</artifactId>
             <version>x.y.z</version>
         </dependency>
-
+```
 
 
 ## LICENSE
