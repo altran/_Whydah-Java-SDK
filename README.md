@@ -21,6 +21,10 @@ For code and examples for other languages, see <https://github.com/cantara/Whyda
         String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
         UserCredential userCredential = new UserCredential("username", "password");
         String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, UUID.randomUUID().toString()).execute();
+        //
+        // Or simply
+        //
+        String userToken =WhydahUtil.logOnApplicationAndUser("https://whydahdev.altrancloud.com/tokenservice/", "applicationID","applicationSecret", "username", "password");
 
 ```
 
