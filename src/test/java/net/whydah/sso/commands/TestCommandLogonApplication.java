@@ -36,32 +36,32 @@ public class TestCommandLogonApplication {
         String applicationsecret = "false secret";
         appCredential.setApplicationSecret(applicationsecret);
 
-        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+        String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
-        assertEquals(ApplicationHelper.getDummyApplicationToken(), myApplicationTokenID);
+        assertEquals(ApplicationHelper.getDummyApplicationToken(), myAppTokenXml);
 
-        Future<String> fAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).queue();
-        assertEquals(ApplicationHelper.getDummyApplicationToken(), fAppTokenID.get());
+        Future<String> fmyAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).queue();
+        assertEquals(ApplicationHelper.getDummyApplicationToken(), fmyAppTokenXml.get());
 
 
-        Observable<String> oAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).observe();
+        Observable<String> omyAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).observe();
         // blocking
-        assertEquals(ApplicationHelper.getDummyApplicationToken(), oAppTokenID.toBlocking().single());
+        assertEquals(ApplicationHelper.getDummyApplicationToken(), omyAppTokenXml.toBlocking().single());
     }
 
     @Test
     public void testApplicationLoginCommand() throws Exception {
 
-        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+        String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
         // System.out.println("ApplicationTokenID=" + myApplicationTokenID);
-        assertTrue(myApplicationTokenID.length() > 6);
+        assertTrue(myAppTokenXml.length() > 6);
 
-        Future<String> fAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).queue();
-        assertTrue(fAppTokenID.get().length() > 6);
+        Future<String> fmyAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).queue();
+        assertTrue(fmyAppTokenXml.get().length() > 6);
 
-        Observable<String> oAppTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).observe();
+        Observable<String> omyAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).observe();
         // blocking
-        assertTrue(oAppTokenID.toBlocking().single().length() > 6);
+        assertTrue(omyAppTokenXml.toBlocking().single().length() > 6);
     }
 
 }
