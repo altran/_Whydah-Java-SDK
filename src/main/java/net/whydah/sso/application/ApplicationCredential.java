@@ -5,6 +5,14 @@ package net.whydah.sso.application;
  */
 
 public class ApplicationCredential {
+
+    public ApplicationCredential(String applicationID, String applicationSecret) {
+        this.applicationID = applicationID;
+        this.applicationSecret=applicationSecret;
+    }
+
+    public ApplicationCredential(){}
+
     private String applicationID = "apphkjhkjhkjh";
     private String applicationSecret = "nmnmnm,n,";
 

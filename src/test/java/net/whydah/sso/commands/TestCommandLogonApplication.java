@@ -26,12 +26,7 @@ public class TestCommandLogonApplication {
     @BeforeClass
     public static void setup() throws Exception {
         tokenServiceUri = UriBuilder.fromUri("https://whydahdev.altrancloud.com/tokenservice/").build();
-        appCredential = new ApplicationCredential();
-        appCredential.setApplicationID("15");
-        String applicationsecret = "33779936R6Jr47D4Hj5R6p9qT";
-        appCredential.setApplicationSecret(applicationsecret);
-
-
+        appCredential = new ApplicationCredential("15","33779936R6Jr47D4Hj5R6p9qT");
     }
 
 

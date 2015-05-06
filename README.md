@@ -12,6 +12,19 @@ A client library which aimed to make Whydah integration more easy and more resil
 For code and examples for other languages, see <https://github.com/cantara/Whydah-TestWebApp>
 
 
+## Example code
+
+```java
+        URI tokenServiceUri = UriBuilder.fromUri("https://whydahdev.altrancloud.com/tokenservice/").build();
+        ApplicationCredential appCredential = new ApplicationCredential("applicationID","applicationSecret");
+        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+        String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
+        UserCredential userCredential = new UserCredential("username", "password");
+        String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, UUID.randomUUID().toString()).execute();
+
+```
+
+
 ## Binaries
 
 Binaries and dependency information for Maven, Ivy, Gradle and others can be found at [http://mvnrepo.cantara.no](http://mvnrepo.cantara.no/index.html#nexus-search;classname~Whydah).
