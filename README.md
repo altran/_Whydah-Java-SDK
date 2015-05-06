@@ -17,7 +17,7 @@ For code and examples for other languages, see <https://github.com/cantara/Whyda
 ```java
         URI tokenServiceUri = UriBuilder.fromUri("https://whydahdev.altrancloud.com/tokenservice/").build();
         ApplicationCredential appCredential = new ApplicationCredential("applicationID","applicationSecret");
-        String myApplicationTokenID = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+        String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
         String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
         UserCredential userCredential = new UserCredential("username", "password");
         String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, UUID.randomUUID().toString()).execute();
