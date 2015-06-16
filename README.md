@@ -7,7 +7,7 @@ A client library which aimed to make Whydah integration more easy and more resil
 * XML and JSON parsing of Whydah datastructures sent over the wire.
 * Client logic for using Whydah Web SSO - SSOLoginWebapp (SSOLWA).
 * Client logic for using and controlling Whydah sessions - SecurityTokenService (STS).
-**	The Java SDK is in a really early stage, and is currently used to experiment with a new remoting approach to increase system resilliance
+** The Java SDK is in a really early stage, and is currently used to experiment with a new remoting approach to increase system resilliance
 
 For code and examples for other languages, see <https://github.com/cantara/Whydah-TestWebApp>
 
