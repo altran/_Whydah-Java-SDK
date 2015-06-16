@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import java.net.URI;
+import java.util.UUID;
 
 import static com.sun.jersey.api.client.ClientResponse.Status.*;
 
@@ -32,6 +33,15 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
     private UserCredential userCredential;
     private String userticket;
 
+
+    public CommandLogonUserByUserCredential(URI tokenServiceUri,String myAppTokenId,String myAppTokenXml ,UserCredential userCredential) {
+        super(HystrixCommandGroupKey.Factory.asKey("SSOAUserAuthGroup"));
+        this.tokenServiceUri = tokenServiceUri;
+        this.myAppTokenId=myAppTokenId;
+        this.myAppTokenXml=myAppTokenXml;
+        this.userCredential=userCredential;
+        this.userticket= UUID.randomUUID().toString();  // Create new UUID ticket if not provided
+    }
 
 
     public CommandLogonUserByUserCredential(URI tokenServiceUri,String myAppTokenId,String myAppTokenXml ,UserCredential userCredential,String userticket) {
@@ -56,21 +66,21 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
         formData.add("usercredential", userCredential.toXML());
         ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
-            logger.info("CommandLogonUserByUserCredential - getUserToken - User authentication failed with status code " + response.getStatus());
+            logger.warn("CommandLogonUserByUserCredential - getUserToken - User authentication failed with status code " + response.getStatus());
             return null;
-            //throw new IllegalArgumentException("Log on failed. " + ClientResponse.Status.FORBIDDEN);
         }
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
-            logger.debug("CommandLogonUserByUserCredential - getUserToken - Log on OK with response {}", responseXML);
+            logger.trace("CommandLogonUserByUserCredential - getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         }
 
         //retry once for other statuses
+        logger.info("CommandLogonUserByUserCredential - getUserToken - retry once for other statuses");
         response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         if (response.getStatus() == OK.getStatusCode()) {
             String responseXML = response.getEntity(String.class);
-            logger.debug("CommandLogonUserByUserCredential - getUserToken - Log on OK with response {}", responseXML);
+            logger.trace("CommandLogonUserByUserCredential - getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         } else if (response.getStatus() == NOT_FOUND.getStatusCode()) {
             logger.error(ExceptionUtil.printableUrlErrorMessage("CommandLogonUserByUserCredential - getUserToken - Auth failed - Problems connecting with TokenService", getUserToken, response));
@@ -78,7 +88,6 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
             logger.info(ExceptionUtil.printableUrlErrorMessage("CommandLogonUserByUserCredential - getUserToken - User authentication failed", getUserToken, response));
         }
         return null;
-        //throw new RuntimeException("User authentication failed with status code " + response.getStatus());
 
     }
 
