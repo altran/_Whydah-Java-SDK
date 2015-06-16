@@ -42,18 +42,18 @@ public class CommandValidateUsertokenId extends HystrixCommand<Boolean> {
 
 // If we get strange values...  return false
         if (usertokenid == null || usertokenid.length() < 4) {
-            logger.trace("CommandValidateUsertokenId - verifyUserTokenId - Called with bogus usertokenid={}. return false",usertokenid);
+            logger.warn("CommandValidateUsertokenId - verifyUserTokenId - Called with bogus usertokenid={}. return false", usertokenid);
             return false;
         }
         // logonApplication();
         WebResource verifyResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid);
         ClientResponse response = verifyResource.get(ClientResponse.class);
         if (response.getStatus() == OK.getStatusCode()) {
-            logger.debug("CommandValidateUsertokenId - verifyUserTokenId - usertokenid validated OK");
+            logger.info("CommandValidateUsertokenId - verifyUserTokenId - validate_usertokenid {}  result {}", "user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid, response);
             return true;
         }
-        if(response.getStatus() == CONFLICT.getStatusCode()) {
-            logger.debug("CommandValidateUsertokenId - verifyUserTokenId - usertokenid not ok: {}", response);
+        if (response.getStatus() == CONFLICT.getStatusCode()) {
+            logger.warn("CommandValidateUsertokenId - verifyUserTokenId - usertokenid not ok: {}", response);
             return false;
         }
         //retry
@@ -61,7 +61,7 @@ public class CommandValidateUsertokenId extends HystrixCommand<Boolean> {
         //logonApplication();
         response = verifyResource.get(ClientResponse.class);
         boolean bolRes = response.getStatus() == OK.getStatusCode();
-        logger.debug("CommandValidateUsertokenId - verifyUserTokenId - validate_usertokenid {}  result {}", "user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid, response);
+        logger.info("CommandValidateUsertokenId - verifyUserTokenId - validate_usertokenid {}  result {}", "user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid, response);
         return bolRes;
     }
 
