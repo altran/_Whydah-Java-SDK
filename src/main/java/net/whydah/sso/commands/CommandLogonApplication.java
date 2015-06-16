@@ -26,11 +26,8 @@ import java.net.URI;
 public class CommandLogonApplication extends HystrixCommand<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandLogonApplication.class);
-
     private URI tokenServiceUri ;
     private ApplicationCredential appCredential ;
-
-
 
     public CommandLogonApplication(URI tokenServiceUri,ApplicationCredential appCredential) {
         super(HystrixCommandGroupKey.Factory.asKey("SSOApplicationAuthGroup"));
@@ -40,33 +37,39 @@ public class CommandLogonApplication extends HystrixCommand<String> {
 
     @Override
     protected String run() {
-
         logger.trace("CommandLogonApplication - appCredential={}",appCredential.toXML());
 
-
         Client tokenServiceClient = Client.create();
-        WebResource logonResource = tokenServiceClient.resource(tokenServiceUri).path("logon");
+
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-
-
         formData.add("applicationcredential", appCredential.toXML());
+
         ClientResponse response;
         try {
+            WebResource logonResource = tokenServiceClient.resource(tokenServiceUri).path("logon");
             response = logonResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         } catch (RuntimeException e) {
-            logger.error("CommandLogonApplication - logonApplication - Problem connecting to {}", logonResource.toString());
+            logger.error("CommandLogonApplication - logonApplication - Problem connecting to {}", tokenServiceClient.resource(tokenServiceUri).path("logon").toString());
             throw(e);
         }
-        //todo håndtere feil i statuskode + feil ved app-pålogging (retry etc)
         if (response.getStatus() != 200) {
-            logger.error("CommandLogonApplication - Application authentication failed with statuscode {}", response.getStatus());
-            throw new RuntimeException("CommandLogonApplication - Application authentication failed");
+            logger.warn("CommandLogonApplication - Application authentication failed with statuscode {} - retrying ", response.getStatus());
+            try {
+                WebResource logonResource = tokenServiceClient.resource(tokenServiceUri).path("logon");
+                response = logonResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+            } catch (RuntimeException e) {
+                logger.error("CommandLogonApplication - logonApplication - Problem connecting to {}", tokenServiceClient.resource(tokenServiceUri).path("logon").toString());
+                throw(e);
+            }
+            if (response.getStatus() != 200) {
+                logger.error("CommandLogonApplication - Application authentication failed with statuscode {}", response.getStatus());
+                throw new RuntimeException("CommandLogonApplication - Application authentication failed");
+            }
         }
         String myAppTokenXml = response.getEntity(String.class);
-        String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
-
         logger.debug("CommandLogonApplication - Applogon ok: apptokenxml: {}", myAppTokenXml);
-        logger.debug("CommandLogonApplication - myAppTokenId: {}", myApplicationTokenID);
+        String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
+        logger.trace("CommandLogonApplication - myAppTokenId: {}", myApplicationTokenID);
         return myAppTokenXml;
     }
 
