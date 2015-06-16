@@ -15,16 +15,10 @@ For code and examples for other languages, see <https://github.com/cantara/Whyda
 ## Example code
 
 ```java
-        URI tokenServiceUri = UriBuilder.fromUri("https://whydahdev.altrancloud.com/tokenservice/").build();
-        ApplicationCredential appCredential = new ApplicationCredential("applicationID","applicationSecret");
-        String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
-        String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
-        UserCredential userCredential = new UserCredential("username", "password");
-        String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, UUID.randomUUID().toString()).execute();
         //
-        // Or simply
-        //
-        String userToken =WhydahUtil.logOnApplicationAndUser("https://whydahdev.altrancloud.com/tokenservice/", "applicationID","applicationSecret", "username", "password");
+        String userToken = WhydahUtil.logOnApplicationAndUser("https://whydahdev.altrancloud.com/tokenservice/",\\
+                           "applicationID","applicationSecret", "username", "password");
+        String userTokenId = UserXpathHelper.getUserTokenId(userToken);
 
 ```
 
