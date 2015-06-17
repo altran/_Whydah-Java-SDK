@@ -14,6 +14,7 @@ import org.junit.Test;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,7 +27,7 @@ public class TestCommandLogonUserByUserCredential {
     private static URI tokenServiceUri;
     private static ApplicationCredential appCredential;
     private static UserCredential userCredential;
-    private static boolean integrationMode=true;
+    private static boolean integrationMode = true;
 
 
     @BeforeClass
@@ -43,7 +44,6 @@ public class TestCommandLogonUserByUserCredential {
         HystrixRequestContext context = HystrixRequestContext.initializeContext();
 
     }
-
 
 
     @Test
@@ -81,22 +81,57 @@ public class TestCommandLogonUserByUserCredential {
     }
 
     @Test
-    public void testFullCircleWithContext() {
-        HystrixRequestContext context = HystrixRequestContext.initializeContext();
-        try {
-            String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
-            String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
-            String userticket = UUID.randomUUID().toString();
-            String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, userticket).execute();
-            String userTokenId = UserXpathHelper.getUserTokenId(userToken);
-            assertTrue(new CommandValidateUsertokenId(tokenServiceUri, myApplicationTokenID, userTokenId).execute());
-            String userToken2 = new CommandGetUsertokenByUserticket(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userticket).execute();
-            assertEquals(userToken,userToken2);
-        } finally {
-            context.shutdown();
-        }
+    public void testFullCircleWithContextTest() {
+            HystrixRequestContext context = HystrixRequestContext.initializeContext();
+            try {
+                String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+                String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
+                String userticket = UUID.randomUUID().toString();
+                String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, userticket).execute();
+                String userTokenId = UserXpathHelper.getUserTokenId(userToken);
+                assertTrue(new CommandValidateUsertokenId(tokenServiceUri, myApplicationTokenID, userTokenId).execute());
+                String userToken2 = new CommandGetUsertokenByUserticket(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userticket).execute();
+                assertEquals(userToken, userToken2);
+            } finally {
+                context.shutdown();
+            }
+
 
     }
 
+    private void testFullCircleWithContext() throws Exception {
+            HystrixRequestContext context = HystrixRequestContext.initializeContext();
+            try {
+                String myAppTokenXml = new CommandLogonApplication(tokenServiceUri, appCredential).execute();
+                String myApplicationTokenID = ApplicationXpathHelper.getAppTokenIdFromAppToken(myAppTokenXml);
+                String userticket = UUID.randomUUID().toString();
+                String userToken = new CommandLogonUserByUserCredential(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userCredential, userticket).execute();
+                String userTokenId = UserXpathHelper.getUserTokenId(userToken);
+                if (!new CommandValidateUsertokenId(tokenServiceUri, myApplicationTokenID, userTokenId).execute()){
+                    throw new ExecutionException("",null);
+                }
+                String userToken2 = new CommandGetUsertokenByUserticket(tokenServiceUri, myApplicationTokenID, myAppTokenXml, userticket).execute();
+//                assertEquals(userToken, userToken2);
+            } finally {
+                context.shutdown();
+            }
 
+
+    }
+
+    @Test
+    public void testRegressionFullCircleWithContext() {
+        int successFull=0;
+        int nonSuccessFull=0;
+        for (int n = 0; n < 100; n++) {
+            try {
+                testFullCircleWithContext();
+                successFull++;
+            } catch (Exception e){
+                nonSuccessFull++;
+            }
+        }
+        System.out.println("Regression result:  success:"+successFull+" Failures: "+nonSuccessFull);
+
+    }
 }
