@@ -2,16 +2,16 @@ package net.whydah.sso.commands;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import java.net.URI;
 
-import static com.sun.jersey.api.client.ClientResponse.Status.CONFLICT;
-import static com.sun.jersey.api.client.ClientResponse.Status.OK;
+import static javax.ws.rs.core.Response.Status.*;
 
 /**
  * Created by totto on 12/2/14.
@@ -38,7 +38,7 @@ public class CommandValidateUsertokenId extends HystrixCommand<Boolean> {
 
         logger.trace("CommandValidateUsertokenId - myAppTokenId={}, userTokenID{}",myAppTokenId,usertokenid);
 
-        Client tokenServiceClient = Client.create();
+        Client tokenServiceClient = ClientBuilder.newClient();
 
 // If we get strange values...  return false
         if (usertokenid == null || usertokenid.length() < 4) {
@@ -46,8 +46,8 @@ public class CommandValidateUsertokenId extends HystrixCommand<Boolean> {
             return false;
         }
         // logonApplication();
-        WebResource verifyResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid);
-        ClientResponse response = verifyResource.get(ClientResponse.class);
+        WebTarget verifyResource = tokenServiceClient.target(tokenServiceUri).path("user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid);
+        Response response = get(verifyResource);
         if (response.getStatus() == OK.getStatusCode()) {
             logger.info("CommandValidateUsertokenId - verifyUserTokenId - validate_usertokenid {}  result {}", "user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid, response);
             return true;
@@ -59,10 +59,14 @@ public class CommandValidateUsertokenId extends HystrixCommand<Boolean> {
         //retry
         logger.info("CommandValidateUsertokenId - verifyUserTokenId - retrying usertokenid ");
         //logonApplication();
-        response = verifyResource.get(ClientResponse.class);
+        response = get(verifyResource);
         boolean bolRes = response.getStatus() == OK.getStatusCode();
         logger.info("CommandValidateUsertokenId - verifyUserTokenId - validate_usertokenid {}  result {}", "user/" + myAppTokenId + "/validate_usertokenid/" + usertokenid, response);
         return bolRes;
+    }
+
+    private Response get(WebTarget verifyResource) {
+        return verifyResource.request().get(Response.class);
     }
 
     @Override

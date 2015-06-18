@@ -2,23 +2,25 @@ package net.whydah.sso.commands;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import net.whydah.sso.application.ApplicationCredential;
 import net.whydah.sso.user.UserCredential;
 import net.whydah.sso.user.UserHelper;
 import net.whydah.sso.util.ExceptionUtil;
+import org.glassfish.jersey.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.UUID;
 
-import static com.sun.jersey.api.client.ClientResponse.Status.*;
+import static javax.ws.rs.core.Response.Status.*;
 
 /**
  * Created by totto on 12/2/14.
@@ -58,28 +60,34 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
 
         logger.trace("CommandLogonUserByUserCredential - myAppTokenId={}",myAppTokenId);
 
-        Client tokenServiceClient = Client.create();
+        Client tokenServiceClient = ClientBuilder.newClient();
 
-        WebResource getUserToken = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/" + userticket + "/usertoken");
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("apptoken", myAppTokenXml);
-        formData.add("usercredential", userCredential.toXML());
-        ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        WebTarget getUserToken = tokenServiceClient.target(tokenServiceUri).path("user/" + myAppTokenId + "/" + userticket + "/usertoken");
+//        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+//        formData.add("apptoken", myAppTokenXml);
+//        formData.add("usercredential", userCredential.toXML());
+        Form formData = new Form();
+        formData.param("apptoken", myAppTokenXml);
+        formData.param("usercredential", userCredential.toXML());
+
+//        WebTarget logonResource = tokenServiceClient.target(tokenServiceUri).path("logon");
+//        ClientResponse response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        Response response = postForm(formData,getUserToken);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
             logger.warn("CommandLogonUserByUserCredential - getUserToken - User authentication failed with status code " + response.getStatus());
             return null;
         }
         if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
+            String responseXML = response.readEntity(String.class);
             logger.trace("CommandLogonUserByUserCredential - getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         }
 
         //retry once for other statuses
         logger.info("CommandLogonUserByUserCredential - getUserToken - retry once for other statuses");
-        response = getUserToken.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        response = postForm(formData,getUserToken);
         if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
+            String responseXML = response.readEntity(String.class);
             logger.trace("CommandLogonUserByUserCredential - getUserToken - Log on OK with response {}", responseXML);
             return responseXML;
         } else if (response.getStatus() == NOT_FOUND.getStatusCode()) {
@@ -89,6 +97,10 @@ public class CommandLogonUserByUserCredential  extends HystrixCommand<String> {
         }
         return null;
 
+    }
+
+    private Response postForm(Form formData, WebTarget logonResource) {
+        return logonResource.request().post(Entity.entity(formData, MediaType.APPLICATION_FORM_URLENCODED_TYPE),Response.class);
     }
 
     @Override

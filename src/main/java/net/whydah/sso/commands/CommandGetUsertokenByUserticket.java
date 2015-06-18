@@ -2,22 +2,23 @@ package net.whydah.sso.commands;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import net.whydah.sso.user.UserCredential;
 import net.whydah.sso.user.UserHelper;
 import net.whydah.sso.util.ExceptionUtil;
+import org.glassfish.jersey.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.net.URI;
 
-import static com.sun.jersey.api.client.ClientResponse.Status.FORBIDDEN;
-import static com.sun.jersey.api.client.ClientResponse.Status.OK;
+import static javax.ws.rs.core.Response.Status.*;
 
 /**
  * Created by totto on 12/2/14.
@@ -44,35 +45,43 @@ public class CommandGetUsertokenByUserticket extends HystrixCommand<String> {
     @Override
     protected String run() {
 
+        String responseXML = null;
         logger.trace("CommandValidateUsertokenId - myAppTokenId={}",myAppTokenId);
 
-        Client tokenServiceClient = Client.create();
+        Client tokenServiceClient = ClientBuilder.newClient();
 
-        WebResource userTokenResource = tokenServiceClient.resource(tokenServiceUri).path("user/" + myAppTokenId + "/get_usertoken_by_userticket");
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        WebTarget userTokenResource = tokenServiceClient.target(tokenServiceUri).path("user/" + myAppTokenId + "/get_usertoken_by_userticket");
         logger.trace("CommandGetUsertokenByUserticket - getUserTokenByUserTicket - ticket: {} apptoken: {}",userticket,myAppTokenXml);
-        formData.add("apptoken", myAppTokenXml);
-        formData.add("userticket", userticket);
-        ClientResponse response = userTokenResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        Form formData = new Form();
+        formData.param("apptoken", myAppTokenXml);
+        formData.param("userticket", userticket);
+
+        Response response = userTokenResource.request().post(Entity.entity(formData, MediaType.APPLICATION_FORM_URLENCODED_TYPE),Response.class);
         if (response.getStatus() == FORBIDDEN.getStatusCode()) {
             logger.warn("CommandGetUsertokenByUserticket - getUserTokenByUserTicket failed");
             throw new IllegalArgumentException("CommandGetUsertokenByUserticket - getUserTokenByUserTicket failed.");
         }
         if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
+            responseXML = response.readEntity(String.class);
             logger.debug("CommandGetUsertokenByUserticket - Response OK with XML: {}", responseXML);
-            return responseXML;
+        } else {
+            //retry
+            response =userTokenResource.request().post(Entity.entity(formData, MediaType.APPLICATION_FORM_URLENCODED_TYPE),Response.class);
+            if (response.getStatus() == OK.getStatusCode()) {
+                responseXML = response.readEntity(String.class);
+                logger.debug("CommandGetUsertokenByUserticket - Response OK with XML: {}", responseXML);
+            }
         }
-        //retry
-        response = userTokenResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
-        if (response.getStatus() == OK.getStatusCode()) {
-            String responseXML = response.getEntity(String.class);
-            logger.debug("CommandGetUsertokenByUserticket - Response OK with XML: {}", responseXML);
-            return responseXML;
+
+        if (responseXML == null) {
+            String authenticationFailedMessage = ExceptionUtil.printableUrlErrorMessage("User authentication failed", userTokenResource, response);
+            logger.warn(authenticationFailedMessage);
+            throw new RuntimeException(authenticationFailedMessage);
         }
-        String authenticationFailedMessage = ExceptionUtil.printableUrlErrorMessage("User authentication failed", userTokenResource, response);
-        logger.warn(authenticationFailedMessage);
-        throw new RuntimeException(authenticationFailedMessage);
+
+        return responseXML;
+
+
     }
 
     @Override

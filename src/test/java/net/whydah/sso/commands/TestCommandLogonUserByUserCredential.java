@@ -2,6 +2,7 @@ package net.whydah.sso.commands;
 
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext;
+import junit.framework.Assert;
 import net.whydah.sso.application.ApplicationCredential;
 import net.whydah.sso.application.ApplicationXpathHelper;
 import net.whydah.sso.user.UserCredential;
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -77,6 +79,9 @@ public class TestCommandLogonUserByUserCredential {
     public void tesLlogOnApplicationAndUser() throws Exception {
 
         String userToken = WhydahUtil.logOnApplicationAndUser(tokenServiceUri.toString(), appCredential.getApplicationID(), appCredential.getApplicationSecret(), userCredential.getUserName(), userCredential.getPassword());
+        assertNotNull(userToken);
+        assertTrue(userToken.contains("usertoken"));
+
 
     }
 
@@ -99,6 +104,7 @@ public class TestCommandLogonUserByUserCredential {
 
     }
 
+
     private void testFullCircleWithContext() throws Exception {
             HystrixRequestContext context = HystrixRequestContext.initializeContext();
             try {
@@ -119,7 +125,7 @@ public class TestCommandLogonUserByUserCredential {
 
     }
 
-    @Test
+    @Ignore
     public void testRegressionFullCircleWithContext() {
         int successFull=0;
         int nonSuccessFull=0;

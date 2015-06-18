@@ -22,7 +22,7 @@
 
     <properties>
         <service.name>Whydah-Java-SDK</service.name>
-        <jersey.version>1.6</jersey.version>
+        <jersey.version>2.18</jersey.version>
         <spring.version>3.0.5.RELEASE</spring.version>
         <jetty.version>7.3.0.v20110203</jetty.version>
     </properties>
@@ -62,7 +62,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
+            <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${jersey.version}</version>
         </dependency>

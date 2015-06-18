@@ -1,7 +1,7 @@
 package net.whydah.sso.util;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 
 /**
  * Created by totto on 12/2/14.
@@ -9,7 +9,7 @@ import com.sun.jersey.api.client.WebResource;
 public class ExceptionUtil {
 
 
-    public static  String printableUrlErrorMessage(String errorMessage, WebResource request, ClientResponse response) {
+    public static  String printableUrlErrorMessage(String errorMessage, WebTarget request, Response response) {
         StringBuilder sb = new StringBuilder();
         sb.append(errorMessage);
         sb.append(" Code: ");
